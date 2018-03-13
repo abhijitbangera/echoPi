@@ -5,6 +5,7 @@ from pytube import YouTube
 import re
 import os
 import ssl
+import speech_recognition as sr
 
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -16,6 +17,17 @@ class EchoPi:
         self.is_alive = True
         self.desktop_path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') 
         self.my_song = vlc.MediaPlayer(self.desktop_path + os.sep+ "myfile.mp4")
+
+    def audio(self):
+        while True:
+            # Record Audio
+            r = sr.Recognizer()
+            with sr.Microphone() as source:
+                print("Say something!")
+                userinput = "Say Something..."
+                audio = r.listen(source)
+                userinput = r.recognize_google(audio)
+                print userinput
 
     def download_video(self, url):
         print ('url is:', url)
@@ -57,4 +69,5 @@ class EchoPi:
             return self.is_alive
 
 obj=EchoPi()
-obj.search_video('lungi dance')
+# obj.search_video('lungi dance')
+obj.audio()

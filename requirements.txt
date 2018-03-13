@@ -1,4 +1,9 @@
+adium-theme-ubuntu==0.3.4
 beautifulsoup4==4.6.0
 lxml==4.1.1
+PyAudio==0.2.11
 python-vlc==3.0.102
 pytube==9.0.6
+SpeechRecognition==3.8.1
+unity-lens-photos==1.0
+virtualenv==15.0.1
