@@ -1,0 +1,4 @@
+beautifulsoup4==4.6.0
+lxml==4.1.1
+python-vlc==3.0.102
+pytube==9.0.6
