@@ -6,7 +6,10 @@ import re
 import os
 import ssl
 import speech_recognition as sr
-
+import pyttsx
+import threading
+import subprocess
+import multiprocessing
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -15,27 +18,69 @@ class EchoPi:
 
     def __init__(self):
         self.is_alive = True
-        self.desktop_path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop') 
+        self.desktop_path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
         self.my_song = vlc.MediaPlayer(self.desktop_path + os.sep+ "myfile.mp4")
+        self.r = None
 
-    def audio(self):
+    def speech_reg(self):
+        print 'sound reg.......'
+
         while True:
-            # Record Audio
             r = sr.Recognizer()
             with sr.Microphone() as source:
                 print("Say something!")
                 userinput = "Say Something..."
                 audio = r.listen(source)
+            try:
                 userinput = r.recognize_google(audio)
                 print userinput
+                userinput_split = userinput.split(" ")
+                if userinput!="stop" and userinput_split[0]=="play":
+                    y= userinput_split
+                    z=y[1:]
+                    p = threading.Thread(target=self.search_video, args=(" ".join(map(str, z)),))
+                    # jobs.append(p)
+                    p.start()
+
+                    # self.search_video(" ".join(map(str, z)))
+                    # while self.is_alive:
+                    #     pass
+                elif userinput == "stop":
+                    print ("Stopping audio playback..")
+
+                    self.my_song.stop()
+                    self.is_alive = False
+                    return self.is_alive
+            except sr.UnknownValueError:
+                print("Google Speech Recognition could not understand audio")
+                userinput = "Google Speech Recognition could not understand audio"
+            except sr.RequestError as e:
+                print("Could not request results from Google Speech Recognition service; {0}".format(e))
+
+
 
     def download_video(self, url):
-        print ('url is:', url)
-        print ("Playing ",YouTube(url).title)
-        yt=YouTube(url).streams.first().download(
+        # print ('url is:', url)
+        # print ("Playing ",YouTube(url).title)
+        # song_title = YouTube(url).title
+        # print "song title is:", song_title
+        # engine = pyttsx.init()
+        # # engine.say('Sally sells seashells by the seashore.')
+        # engine.say("playing "+song_title)
+        # engine.runAndWait()
+        # yt=YouTube(url).streams.first().download(
+        #     self.desktop_path, filename='myfile')
+        myfile = self.desktop_path + os.sep + "myfile.mp4"
+        os.remove(myfile) if os.path.exists(myfile) else None
+        yt = YouTube(url).streams.filter(only_audio=True)
+        yt.first().download(
             self.desktop_path, filename='myfile')
         print ('done')
-        self.playAudio()
+        # self.playAudio()
+        self.my_song.play()
+        print ('done playing song')
+        return
+
 
     def search_video(self, text):
         textToSearch = text
@@ -54,15 +99,18 @@ class EchoPi:
         else:
             song_to_play =  mylist[1]
         self.download_video(song_to_play)
+        return
+    #
+    # def playAudio(self):
+    #     self.my_song.play()
+    #     while self.is_alive:
+    #         self.stopAudio()
 
-    def playAudio(self):
-        self.my_song.play()
-        while self.is_alive:
-            self.stopAudio()
 
     def stopAudio(self):
-        x=raw_input("Enter:")
-        if x.lower() == "stop":
+
+        userinput =raw_input("Enter:")
+        if userinput.lower() == "stop":
             print ("Stopping audio playback..")
             self.my_song.stop()
             self.is_alive = False
@@ -70,4 +118,4 @@ class EchoPi:
 
 obj=EchoPi()
 # obj.search_video('lungi dance')
-obj.audio()
+obj.speech_reg()
