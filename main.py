@@ -10,6 +10,7 @@ import pyttsx
 import threading
 import subprocess
 import multiprocessing
+import wolframalpha
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -22,6 +23,33 @@ class EchoPi:
         self.my_song = vlc.MediaPlayer(self.desktop_path + os.sep+ "myfile.mp4")
         self.r = None
 
+    def get_answer(self, question):
+        app_id = ''  # wolframalpha app ID
+        print "question is:", question
+        if question == "who are you" or question == "what is your name":
+            answer = "I am Jarvis"
+        else:
+            try:
+                client = wolframalpha.Client(app_id)
+                res = client.query(question)
+                print "res is:", res
+                for pod in res.pods:
+                    for sub in pod.subpods:
+                        print "inside pods"
+                        print(sub)
+                print ('$$$$$$$$$$$$$$$$$$$$$$$')
+                print(next(res.results).text)
+                answer = next(res.results).text
+            except Exception as e:
+                print e
+                answer = "Something went wrong. Lets try it again. Shall we?"
+        engine = pyttsx.init()
+        # engine.say('Sally sells seashells by the seashore.')
+        engine.say(answer)
+        # update_text(answer)
+        engine.runAndWait()
+        return
+
     def speech_reg(self):
         print 'sound reg.......'
 
@@ -29,7 +57,6 @@ class EchoPi:
             r = sr.Recognizer()
             with sr.Microphone() as source:
                 print("Say something!")
-                userinput = "Say Something..."
                 audio = r.listen(source)
             try:
                 userinput = r.recognize_google(audio)
@@ -42,15 +69,15 @@ class EchoPi:
                     # jobs.append(p)
                     p.start()
 
-                    # self.search_video(" ".join(map(str, z)))
-                    # while self.is_alive:
-                    #     pass
                 elif userinput == "stop":
                     print ("Stopping audio playback..")
-
                     self.my_song.stop()
                     self.is_alive = False
                     return self.is_alive
+                elif userinput_split[0].lower() == "jarvis":
+                    y = userinput_split
+                    z = y[1:]
+                    self.get_answer(" ".join(map(str, z)))
             except sr.UnknownValueError:
                 print("Google Speech Recognition could not understand audio")
                 userinput = "Google Speech Recognition could not understand audio"
@@ -115,6 +142,7 @@ class EchoPi:
             self.my_song.stop()
             self.is_alive = False
             return self.is_alive
+
 
 obj=EchoPi()
 # obj.search_video('lungi dance')
