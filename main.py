@@ -31,11 +31,11 @@ class EchoPi:
         engine.runAndWait()
 
     def get_answer(self, question):
-        app_id = 'QU6J9G-VKXGR8R9KQ'  # wolframalpha app ID
+        app_id = ''  # Enter wolframalpha app ID here
         print ("question is:", question)
         text="answer to your question is"
         self.speak(text)
-        if question == "who are you" or question == "what is your name":
+        if question == "who are you" or question == "what is your name": # a small dirty cheat to look cool :P
             answer = "I am Jarvis"
         else:
             try:
@@ -45,9 +45,8 @@ class EchoPi:
                 for pod in res.pods:
                     for sub in pod.subpods:
                         print(sub)
-                print ('$$$$$$$$$$$$$$$$$$$$$$$')
-                print(next(res.results).text)
                 answer = next(res.results).text
+                print (answer)
             except Exception as e:
                 print (e)
                 answer = "Something went wrong. Lets try it again. Shall we?"
@@ -70,14 +69,12 @@ class EchoPi:
                     z=y[1:]
                     p = threading.Thread(target=self.search_video, args=(" ".join(map(str, z)),))
                     p.start()
-
                 elif userinput == "stop":
                     print ("Stopping audio playback..")
                     self.my_song.stop()
                     self.is_alive = False
                     text="Audio playback stopped"
                     self.speak(text)
-                    
                     #return self.is_alive
                 elif userinput_split[0].lower() == "jarvis":
                     y = userinput_split
