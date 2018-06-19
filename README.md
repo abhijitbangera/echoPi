@@ -23,6 +23,8 @@ Speakers for audio output
 3. To stop a song from playing, simply say "stop". 
 
 ### Video Demo:
+(click on below image)
+
 [![Watch the video](https://raw.githubusercontent.com/abhijitbangera/echoPi/master/hardwares.jpg)](http://abhijitbangera.com/wp-content/uploads/2018/06/VID_20180615_193558_compressed.mp4)
 
 Known issue:
